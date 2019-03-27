@@ -4,16 +4,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayout;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
-    /*
-    * Datos de matriz:
+    /*Datos de matriz:
     *   0 = nada
     *   1 = L {(x,y),(x+1,y),(x+2,y),(x+2,y-1)}
     *   2 = J {(x,y),(x+1,y),(x+2,y),(x+2,y+1)}
@@ -21,13 +20,16 @@ public class MainActivity extends AppCompatActivity {
     *   4 = Z {(x,y),(x+1,y),(x+1,y+1),(x+2,y+1)}
     *   5 = T {(x,y),(x+1,y-1),(x+1,y),(x+1,y+1)}
     *   6 = I {(x,y),(x+1,y),(x+2,y),(x+3,y)}
-    *   7 = O {(x,y),(x,y+1),(x+1,y),(x+1,y+1)}
-    * */
+    *   7 = O {(x,y),(x,y+1),(x+1,y),(x+1,y+1)}*/
 
     ArrayList<ArrayList<Integer>> matriz;
     GridLayout grid;
     ArrayList<ArrayList<Integer>> fichaActual;
+    Button btnIniciar;
+    Button btnPausar;
     int tipoFichaActual;
+    boolean activo;
+    boolean pausado;
 
     void pintarTablero(){
         int child = 0;
@@ -54,16 +56,37 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void onBtnIniciar(View view){
+        if(!activo){
+            inicializarMatriz();
+            activo = true;
+            pausado = false;
+            btnIniciar.setText("Reiniciar");
+        }
+    }
+
+    public void onBtnPausar(View view){
+        if(!pausado){
+            pausado = true;
+            btnPausar.setText("Reanudar");
+        }
+        else{
+            pausado = false;
+            btnPausar.setText("Detener");
+        }
+    }
+
     void bajarFicha(){
         int fil,col;
         for(int i=0; i<4; i++){
-            fil = fichaActual.get(i).get(1);
-            col = fichaActual.get(i).get(2);
+            fil = fichaActual.get(i).get(0);
+            col = fichaActual.get(i).get(1);
             matriz.get(fil).set(col,0);
             int valor = fichaActual.get(i).get(1);
             fichaActual.get(i).set(1, valor+1);
-            fil = fichaActual.get(i).get(1);
-            col = fichaActual.get(i).get(2);
+            fil = fichaActual.get(i).get(0);
+            col = fichaActual.get(i).get(1);
+            Log.i("Info", String.format("%d,%d", fil, col));
             matriz.get(fil).set(col,tipoFichaActual);
         }
     }
@@ -72,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<Integer> pos;
         pos = new ArrayList<>();
         fichaActual.clear();
+        tipoFichaActual = modo;
         switch (modo){
             case 1://L
                 pos.clear();pos.add(fil); pos.add(col);
@@ -171,6 +195,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        fichaActual = new ArrayList<>();
+
+        btnIniciar = findViewById(R.id.btnIniciar);
+        btnPausar = findViewById(R.id.btnParar);
         grid = findViewById(R.id.gridLayout);
         inicializarMatriz();
 
@@ -191,12 +219,29 @@ public class MainActivity extends AppCompatActivity {
         }
 
         pintarTablero();
+        activo = false;
+        pausado = false;
 
-        new Timer().scheduleAtFixedRate(new TimerTask() {
+        setFichaActual(1,2,2);
+
+        Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                //pintarTablero();
+                try {
+                    while(true) {
+                        if (pausado) {
+                            Thread.sleep(1000);
+                            Log.i("Info", "1seg");
+                            //bajarFicha();
+                            pintarTablero();
+                            leerMatriz();
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
-        }, 0, 1000);
+        };
+
     }
 }
