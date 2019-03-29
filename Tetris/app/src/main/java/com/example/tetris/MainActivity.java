@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
     /*Datos de matriz:
@@ -58,9 +59,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void onBtnIniciar(View view){
         if(!activo){
-            inicializarMatriz();
             activo = true;
-            pausado = false;
+            pausado = true;
             btnIniciar.setText("Reiniciar");
         }
     }
@@ -98,74 +98,102 @@ public class MainActivity extends AppCompatActivity {
         tipoFichaActual = modo;
         switch (modo){
             case 1://L
-                pos.clear();pos.add(fil); pos.add(col);
-                fichaActual.add(pos);
-                pos.clear();pos.add(fil+1); pos.add(col);
-                fichaActual.add(pos);
-                pos.clear();pos.add(fil+2); pos.add(col);
-                fichaActual.add(pos);
-                pos.clear();pos.add(fil+2); pos.add(col+1);
-                fichaActual.add(pos);
+                //pos.clear();pos.add(fil); pos.add(col);
+                matriz.get(fil).set(col,1);
+                //fichaActual.add(pos);
+                //pos.clear();pos.add(fil+1); pos.add(col);
+                matriz.get(fil+1).set(col,1);
+                //fichaActual.add(pos);
+                //pos.clear();pos.add(fil+2); pos.add(col);
+                matriz.get(fil+2).set(col,1);
+                //fichaActual.add(pos);
+                //pos.clear();pos.add(fil+2); pos.add(col+1);
+                matriz.get(fil+2).set(col+1,1);
+                //fichaActual.add(pos);
                 break;
             case 2://J
-                pos.clear();pos.add(fil); pos.add(col);
-                fichaActual.add(pos);
-                pos.clear();pos.add(fil+1); pos.add(col);
-                fichaActual.add(pos);
-                pos.clear();pos.add(fil+2); pos.add(col);
-                fichaActual.add(pos);
-                pos.clear();pos.add(fil+2); pos.add(col-1);
-                fichaActual.add(pos);
+                //pos.clear();pos.add(fil); pos.add(col);
+                //fichaActual.add(pos);
+                matriz.get(fil).set(col,2);
+                //pos.clear();pos.add(fil+1); pos.add(col);
+                //fichaActual.add(pos);
+                matriz.get(fil+1).set(col,2);
+                //pos.clear();pos.add(fil+2); pos.add(col);
+                //fichaActual.add(pos);
+                matriz.get(fil+2).set(col,2);
+                //pos.clear();pos.add(fil+2); pos.add(col-1);
+                //fichaActual.add(pos);
+                matriz.get(fil+2).set(col-1,2);
                 break;
             case 3: //S
-                pos.clear();pos.add(fil); pos.add(col);
-                fichaActual.add(pos);
-                pos.clear();pos.add(fil+1); pos.add(col);
-                fichaActual.add(pos);
-                pos.clear();pos.add(fil+1); pos.add(col+1);
-                fichaActual.add(pos);
-                pos.clear();pos.add(fil+2); pos.add(col+1);
-                fichaActual.add(pos);
+                //pos.clear();pos.add(fil); pos.add(col);
+                //fichaActual.add(pos);
+                matriz.get(fil).set(col,3);
+                //pos.clear();pos.add(fil+1); pos.add(col);
+                //fichaActual.add(pos);
+                matriz.get(fil+1).set(col,3);
+                //pos.clear();pos.add(fil+1); pos.add(col+1);
+                //fichaActual.add(pos);
+                matriz.get(fil+1).set(col+1,3);
+                //pos.clear();pos.add(fil+2); pos.add(col+1);
+                //fichaActual.add(pos);
+                matriz.get(fil+2).set(col+1,3);
                 break;
             case 4: //Z
-                pos.clear();pos.add(fil); pos.add(col);
-                fichaActual.add(pos);
-                pos.clear();pos.add(fil+1); pos.add(col);
-                fichaActual.add(pos);
-                pos.clear();pos.add(fil+1); pos.add(col-1);
-                fichaActual.add(pos);
-                pos.clear();pos.add(fil+2); pos.add(col-1);
-                fichaActual.add(pos);
+                //pos.clear();pos.add(fil); pos.add(col);
+                //fichaActual.add(pos);
+                matriz.get(fil).set(col,4);
+                //pos.clear();pos.add(fil+1); pos.add(col);
+                //fichaActual.add(pos);
+                matriz.get(fil+1).set(col,4);
+                //pos.clear();pos.add(fil+1); pos.add(col-1);
+                //fichaActual.add(pos);
+                matriz.get(fil+1).set(col-1,4);
+                //pos.clear();pos.add(fil+2); pos.add(col-1);
+                //fichaActual.add(pos);
+                matriz.get(fil+2).set(col-1,4);
                 break;
             case 5: //T
-                pos.clear();pos.add(fil); pos.add(col);
-                fichaActual.add(pos);
-                pos.clear();pos.add(fil+1); pos.add(col-1);
-                fichaActual.add(pos);
-                pos.clear();pos.add(fil+1); pos.add(col);
-                fichaActual.add(pos);
-                pos.clear();pos.add(fil+1); pos.add(col+1);
-                fichaActual.add(pos);
+                //pos.clear();pos.add(fil); pos.add(col);
+                //fichaActual.add(pos);
+                matriz.get(fil).set(col,5);
+                //pos.clear();pos.add(fil+1); pos.add(col-1);
+                //fichaActual.add(pos);
+                matriz.get(fil+1).set(col-1,5);
+                //pos.clear();pos.add(fil+1); pos.add(col);
+                //fichaActual.add(pos);
+                matriz.get(fil+1).set(col,5);
+                //pos.clear();pos.add(fil+1); pos.add(col+1);
+                //fichaActual.add(pos);
+                matriz.get(fil+1).set(col+1,5);
                 break;
             case 6: //I
-                pos.clear();pos.add(fil); pos.add(col);
-                fichaActual.add(pos);
-                pos.clear();pos.add(fil+1); pos.add(col);
-                fichaActual.add(pos);
-                pos.clear();pos.add(fil+2); pos.add(col);
-                fichaActual.add(pos);
-                pos.clear();pos.add(fil+3); pos.add(col);
-                fichaActual.add(pos);
+                //pos.clear();pos.add(fil); pos.add(col);
+                //fichaActual.add(pos);
+                matriz.get(fil).set(col,6);
+                //pos.clear();pos.add(fil+1); pos.add(col);
+                //fichaActual.add(pos);
+                matriz.get(fil+1).set(col,6);
+                //pos.clear();pos.add(fil+2); pos.add(col);
+                //fichaActual.add(pos);
+                matriz.get(fil+2).set(col,6);
+                //pos.clear();pos.add(fil+3); pos.add(col);
+                //fichaActual.add(pos);
+                matriz.get(fil+3).set(col,6);
                 break;
             case 7: // O
-                pos.clear();pos.add(fil); pos.add(col);
-                fichaActual.add(pos);
-                pos.clear();pos.add(fil); pos.add(col+1);
-                fichaActual.add(pos);
-                pos.clear();pos.add(fil+1); pos.add(col);
-                fichaActual.add(pos);
-                pos.clear();pos.add(fil+1); pos.add(col+1);
-                fichaActual.add(pos);
+                //pos.clear();pos.add(fil); pos.add(col);
+                //fichaActual.add(pos);
+                matriz.get(fil).set(col,7);
+                //pos.clear();pos.add(fil); pos.add(col+1);
+                //fichaActual.add(pos);
+                matriz.get(fil).set(col+1,7);
+                //pos.clear();pos.add(fil+1); pos.add(col);
+                //fichaActual.add(pos);
+                matriz.get(fil+1).set(col,7);
+                //pos.clear();pos.add(fil+1); pos.add(col+1);
+                //fichaActual.add(pos);
+                matriz.get(fil+1).set(col+1,7);
                 break;
             default:
                 break;
@@ -174,9 +202,9 @@ public class MainActivity extends AppCompatActivity {
 
     void inicializarMatriz(){
         matriz = new ArrayList<>();
-        ArrayList<Integer> col = new ArrayList<>();
+        ArrayList<Integer> col;
         for(int i=0; i<10; i++){
-            col.clear();
+            col = new ArrayList<>();
             for(int j=0; j<10; j++){
                 col.add(0);
             }
@@ -222,26 +250,31 @@ public class MainActivity extends AppCompatActivity {
         activo = false;
         pausado = false;
 
-        setFichaActual(1,2,2);
-
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    while(true) {
-                        if (pausado) {
-                            Thread.sleep(1000);
-                            Log.i("Info", "1seg");
-                            //bajarFicha();
-                            pintarTablero();
-                            leerMatriz();
-                        }
+        new Thread(){
+            public void run(){
+                while(true){
+                    try{
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                pintarTablero();
+                                Log.i("Info", "Entra");
+                                if (pausado) {
+                                    Log.i("Info", "Activo");
+                                    //bajarFicha();
+                                    pintarTablero();
+                                    int a = new Random().nextInt(7)+1;
+                                    setFichaActual(a,1,5);
+                                    leerMatriz();
+                                }
+                            }
+                        });
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
                 }
             }
-        };
-
+        }.start();
     }
 }
