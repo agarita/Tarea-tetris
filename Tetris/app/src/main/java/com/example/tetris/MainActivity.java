@@ -23,14 +23,15 @@ public class MainActivity extends AppCompatActivity {
     *   6 = I {(x,y),(x+1,y),(x+2,y),(x+3,y)}
     *   7 = O {(x,y),(x,y+1),(x+1,y),(x+1,y+1)}*/
 
-    ArrayList<ArrayList<Integer>> matriz;
     GridLayout grid;
-    ArrayList<ArrayList<Integer>> fichaActual;
-    Button btnIniciar;
-    Button btnPausar;
-    int tipoFichaActual;
-    boolean activo;
     boolean pausado;
+    boolean iniciado;
+    boolean primerFicha;
+    Button btnPausar;
+    Button btnIniciar;
+    int tipoFichaActual;
+    ArrayList<ArrayList<Integer>> matrizLogica;
+    ArrayList<ArrayList<Integer>> matrizGrafica;
 
     void pintarTablero(){
         int child = 0;
@@ -41,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
                     view.setImageResource(android.R.color.darker_gray);
                 }
                 else{
-                    switch (matriz.get(i).get(j)){
+                    switch (matrizGrafica.get(i).get(j)){
                         case 1: view.setImageResource(android.R.color.holo_orange_dark);break;
                         case 2: view.setImageResource(android.R.color.holo_blue_dark);break;
                         case 3: view.setImageResource(android.R.color.holo_green_dark);break;
@@ -58,142 +59,183 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onBtnIniciar(View view){
-        if(!activo){
-            activo = true;
-            pausado = true;
+        if(iniciado){
+            matrizGrafica.clear();
+            inicializarMatriz();
+            iniciado = pausado = primerFicha = false;
+            btnIniciar.setText("Iniciar");
+            btnPausar.setText("Detener");
+        }
+        else{
+            iniciado = pausado = primerFicha = true;
             btnIniciar.setText("Reiniciar");
         }
     }
 
     public void onBtnPausar(View view){
-        if(!pausado){
-            pausado = true;
+        if(pausado){
+            pausado = false;
             btnPausar.setText("Reanudar");
         }
         else{
-            pausado = false;
+            pausado = true;
             btnPausar.setText("Detener");
         }
     }
 
+    public void onBtnIzq(View view){
+        int tamano = matrizLogica.size();
+        boolean izquierda = false;
+        for(int i = 0; i < tamano; i++){
+            for(int j = 0; j < tamano; j++){
+                if(matrizLogica.get(i).get(j) == 1){
+                    if(j == 1 || matrizLogica.get(i).get(j-1) == 2 || izquierda){
+                        izquierda = true;
+                    }
+                    else {
+                        matrizGrafica.get(i).set(j, 0);
+                        matrizLogica.get(i).set(j, 0);
+                        matrizLogica.get(i).set(j-1, 1);
+                    }
+                }
+            }
+        }
+        for(int i = 0; i < tamano; i++){
+            for(int j = 0; j < tamano; j++){
+                if(matrizLogica.get(i).get(j) == 1){
+                    matrizGrafica.get(i).set(j, tipoFichaActual);
+                }
+            }
+        }
+        pintarTablero();
+    }
+
+    public void onBtnDer(View view){
+        int tamano = matrizLogica.size()-1;
+        boolean derecha = false;
+        for(int i = tamano; i >= 0; i--){
+            for(int j = tamano; j >= 0; j--){
+                if(matrizLogica.get(i).get(j) == 1){
+                    if(j == tamano|| matrizLogica.get(i).get(j+1) == 2 || derecha){
+                        derecha = true;
+                    }
+                    else {
+                        matrizGrafica.get(i).set(j, 0);
+                        matrizLogica.get(i).set(j, 0);
+                        matrizLogica.get(i).set(j+1, 1);
+                    }
+                }
+            }
+        }
+        for(int i = tamano; i >= 0; i--){
+            for(int j = tamano; j >= 0; j--){
+                if(matrizLogica.get(i).get(j) == 1){
+                    matrizGrafica.get(i).set(j, tipoFichaActual);
+                }
+            }
+        }
+        pintarTablero();
+    }
+
+    public void onBtnGirar(View view){
+
+    }
+
     void bajarFicha(){
-        int fil,col;
-        for(int i=0; i<4; i++){
-            fil = fichaActual.get(i).get(0);
-            col = fichaActual.get(i).get(1);
-            matriz.get(fil).set(col,0);
-            int valor = fichaActual.get(i).get(1);
-            fichaActual.get(i).set(1, valor+1);
-            fil = fichaActual.get(i).get(0);
-            col = fichaActual.get(i).get(1);
-            Log.i("Info", String.format("%d,%d", fil, col));
-            matriz.get(fil).set(col,tipoFichaActual);
+        int tamano = matrizLogica.size()-1;
+        boolean fondo = false;
+        for(int i = tamano; i >= 0; i--){
+            for(int j = tamano; j >= 0; j--){
+                if(matrizLogica.get(i).get(j) == 1){
+                    if(i == tamano || matrizLogica.get(i+1).get(j) == 2||fondo){
+                        fondo = true;
+                        matrizLogica.get(i).set(j, 2);
+                    }
+                    else {
+                        matrizGrafica.get(i).set(j, 0);
+                        matrizLogica.get(i).set(j, 0);
+                        matrizLogica.get(i + 1).set(j, 1);
+                    }
+                }
+            }
+        }
+        for(int i = tamano; i >= 0; i--){
+            for(int j = tamano; j >= 0; j--){
+                if(matrizLogica.get(i).get(j) == 1){
+                    matrizGrafica.get(i).set(j, tipoFichaActual);
+                }
+            }
+        }
+        if(fondo){
+            borrarFilas();
+            int a = new Random().nextInt(7) + 1;
+            setFichaActual(a, 1, 5);
         }
     }
 
+    void borrarFilas(){
+        int tamano = matrizLogica.size()-2;
+        ArrayList<Integer> columna;
+        for(int i = tamano; i >= 0; i--){
+            columna = matrizLogica.get(i);
+            Log.i("Info", columna.toString());
+            for(int j = tamano; j >= 0; j--)
+                Log.i("Info",columna.get(j).toString());
+        }
+    }
+
+    boolean tocaTecho(){
+        return false;
+    }
+
+    void pierde(){
+
+    }
+
     void setFichaActual(int modo, int fil, int col){
-        ArrayList<Integer> pos;
-        pos = new ArrayList<>();
-        fichaActual.clear();
         tipoFichaActual = modo;
         switch (modo){
             case 1://L
-                //pos.clear();pos.add(fil); pos.add(col);
-                matriz.get(fil).set(col,1);
-                //fichaActual.add(pos);
-                //pos.clear();pos.add(fil+1); pos.add(col);
-                matriz.get(fil+1).set(col,1);
-                //fichaActual.add(pos);
-                //pos.clear();pos.add(fil+2); pos.add(col);
-                matriz.get(fil+2).set(col,1);
-                //fichaActual.add(pos);
-                //pos.clear();pos.add(fil+2); pos.add(col+1);
-                matriz.get(fil+2).set(col+1,1);
-                //fichaActual.add(pos);
+                matrizGrafica.get(fil).set(col,1);      matrizLogica.get(fil).set(col,1);
+                matrizGrafica.get(fil+1).set(col,1);    matrizLogica.get(fil+1).set(col,1);
+                matrizGrafica.get(fil+2).set(col,1);    matrizLogica.get(fil+2).set(col,1);
+                matrizGrafica.get(fil+2).set(col+1,1);  matrizLogica.get(fil+2).set(col+1,1);
                 break;
             case 2://J
-                //pos.clear();pos.add(fil); pos.add(col);
-                //fichaActual.add(pos);
-                matriz.get(fil).set(col,2);
-                //pos.clear();pos.add(fil+1); pos.add(col);
-                //fichaActual.add(pos);
-                matriz.get(fil+1).set(col,2);
-                //pos.clear();pos.add(fil+2); pos.add(col);
-                //fichaActual.add(pos);
-                matriz.get(fil+2).set(col,2);
-                //pos.clear();pos.add(fil+2); pos.add(col-1);
-                //fichaActual.add(pos);
-                matriz.get(fil+2).set(col-1,2);
+                matrizGrafica.get(fil).set(col,2);      matrizLogica.get(fil).set(col,1);
+                matrizGrafica.get(fil+1).set(col,2);    matrizLogica.get(fil+1).set(col,1);
+                matrizGrafica.get(fil+2).set(col,2);    matrizLogica.get(fil+2).set(col,1);
+                matrizGrafica.get(fil+2).set(col-1,2);  matrizLogica.get(fil+2).set(col-1,1);
                 break;
             case 3: //S
-                //pos.clear();pos.add(fil); pos.add(col);
-                //fichaActual.add(pos);
-                matriz.get(fil).set(col,3);
-                //pos.clear();pos.add(fil+1); pos.add(col);
-                //fichaActual.add(pos);
-                matriz.get(fil+1).set(col,3);
-                //pos.clear();pos.add(fil+1); pos.add(col+1);
-                //fichaActual.add(pos);
-                matriz.get(fil+1).set(col+1,3);
-                //pos.clear();pos.add(fil+2); pos.add(col+1);
-                //fichaActual.add(pos);
-                matriz.get(fil+2).set(col+1,3);
+                matrizGrafica.get(fil).set(col,3);      matrizLogica.get(fil).set(col,1);
+                matrizGrafica.get(fil+1).set(col,3);    matrizLogica.get(fil+1).set(col,1);
+                matrizGrafica.get(fil+1).set(col+1,3);  matrizLogica.get(fil+1).set(col+1,1);
+                matrizGrafica.get(fil+2).set(col+1,3);  matrizLogica.get(fil+2).set(col+1,1);
                 break;
             case 4: //Z
-                //pos.clear();pos.add(fil); pos.add(col);
-                //fichaActual.add(pos);
-                matriz.get(fil).set(col,4);
-                //pos.clear();pos.add(fil+1); pos.add(col);
-                //fichaActual.add(pos);
-                matriz.get(fil+1).set(col,4);
-                //pos.clear();pos.add(fil+1); pos.add(col-1);
-                //fichaActual.add(pos);
-                matriz.get(fil+1).set(col-1,4);
-                //pos.clear();pos.add(fil+2); pos.add(col-1);
-                //fichaActual.add(pos);
-                matriz.get(fil+2).set(col-1,4);
+                matrizGrafica.get(fil).set(col,4);      matrizLogica.get(fil).set(col,1);
+                matrizGrafica.get(fil+1).set(col,4);    matrizLogica.get(fil+1).set(col,1);
+                matrizGrafica.get(fil+1).set(col-1,4);  matrizLogica.get(fil+1).set(col-1,1);
+                matrizGrafica.get(fil+2).set(col-1,4);  matrizLogica.get(fil+2).set(col-1,1);
                 break;
             case 5: //T
-                //pos.clear();pos.add(fil); pos.add(col);
-                //fichaActual.add(pos);
-                matriz.get(fil).set(col,5);
-                //pos.clear();pos.add(fil+1); pos.add(col-1);
-                //fichaActual.add(pos);
-                matriz.get(fil+1).set(col-1,5);
-                //pos.clear();pos.add(fil+1); pos.add(col);
-                //fichaActual.add(pos);
-                matriz.get(fil+1).set(col,5);
-                //pos.clear();pos.add(fil+1); pos.add(col+1);
-                //fichaActual.add(pos);
-                matriz.get(fil+1).set(col+1,5);
+                matrizGrafica.get(fil).set(col,5);      matrizLogica.get(fil).set(col,1);
+                matrizGrafica.get(fil+1).set(col-1,5);  matrizLogica.get(fil+1).set(col-1,1);
+                matrizGrafica.get(fil+1).set(col,5);    matrizLogica.get(fil+1).set(col,1);
+                matrizGrafica.get(fil+1).set(col+1,5);  matrizLogica.get(fil+1).set(col+1,1);
                 break;
             case 6: //I
-                //pos.clear();pos.add(fil); pos.add(col);
-                //fichaActual.add(pos);
-                matriz.get(fil).set(col,6);
-                //pos.clear();pos.add(fil+1); pos.add(col);
-                //fichaActual.add(pos);
-                matriz.get(fil+1).set(col,6);
-                //pos.clear();pos.add(fil+2); pos.add(col);
-                //fichaActual.add(pos);
-                matriz.get(fil+2).set(col,6);
-                //pos.clear();pos.add(fil+3); pos.add(col);
-                //fichaActual.add(pos);
-                matriz.get(fil+3).set(col,6);
+                matrizGrafica.get(fil).set(col,6);      matrizLogica.get(fil).set(col,1);
+                matrizGrafica.get(fil+1).set(col,6);    matrizLogica.get(fil+1).set(col,1);
+                matrizGrafica.get(fil+2).set(col,6);    matrizLogica.get(fil+2).set(col,1);
+                matrizGrafica.get(fil+3).set(col,6);    matrizLogica.get(fil+3).set(col,1);
                 break;
             case 7: // O
-                //pos.clear();pos.add(fil); pos.add(col);
-                //fichaActual.add(pos);
-                matriz.get(fil).set(col,7);
-                //pos.clear();pos.add(fil); pos.add(col+1);
-                //fichaActual.add(pos);
-                matriz.get(fil).set(col+1,7);
-                //pos.clear();pos.add(fil+1); pos.add(col);
-                //fichaActual.add(pos);
-                matriz.get(fil+1).set(col,7);
-                //pos.clear();pos.add(fil+1); pos.add(col+1);
-                //fichaActual.add(pos);
-                matriz.get(fil+1).set(col+1,7);
+                matrizGrafica.get(fil).set(col,7);      matrizLogica.get(fil).set(col,1);
+                matrizGrafica.get(fil).set(col+1,7);    matrizLogica.get(fil).set(col+1,1);
+                matrizGrafica.get(fil+1).set(col,7);    matrizLogica.get(fil+1).set(col,1);
+                matrizGrafica.get(fil+1).set(col+1,7);  matrizLogica.get(fil+1).set(col+1,1);
                 break;
             default:
                 break;
@@ -201,18 +243,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void inicializarMatriz(){
-        matriz = new ArrayList<>();
+        matrizGrafica = new ArrayList<>();
+        matrizLogica = new ArrayList<>();
         ArrayList<Integer> col;
+        ArrayList<Integer> col2;
         for(int i=0; i<10; i++){
             col = new ArrayList<>();
+            col2 = new ArrayList<>();
             for(int j=0; j<10; j++){
                 col.add(0);
+                col2.add(0);
             }
-            matriz.add(col);
+            matrizLogica.add(col);
+            matrizGrafica.add(col2);
         }
     }
 
-    void leerMatriz(){
+    void leerMatriz(ArrayList<ArrayList<Integer>> matriz){
         for(int i=0; i<10; i++){
             Log.i("Info", String.format("%s", matriz.get(i).toString()));
         }
@@ -222,8 +269,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        fichaActual = new ArrayList<>();
 
         btnIniciar = findViewById(R.id.btnIniciar);
         btnPausar = findViewById(R.id.btnParar);
@@ -247,8 +292,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         pintarTablero();
-        activo = false;
-        pausado = false;
+        primerFicha = iniciado = pausado = false;
 
         new Thread(){
             public void run(){
@@ -257,19 +301,22 @@ public class MainActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                if(primerFicha){
+                                    int a = new Random().nextInt(7) + 1;
+                                    setFichaActual(a, 1, 5);
+                                    primerFicha = false;
+                                }
                                 pintarTablero();
-                                Log.i("Info", "Entra");
-                                if (pausado) {
-                                    Log.i("Info", "Activo");
-                                    //bajarFicha();
-                                    pintarTablero();
-                                    int a = new Random().nextInt(7)+1;
-                                    setFichaActual(a,1,5);
-                                    leerMatriz();
+                                if(iniciado){
+                                    if (pausado) {
+                                        bajarFicha();
+                                        if(tocaTecho())
+                                            pierde();
+                                    }
                                 }
                             }
                         });
-                        Thread.sleep(1000);
+                        Thread.sleep(1200);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
